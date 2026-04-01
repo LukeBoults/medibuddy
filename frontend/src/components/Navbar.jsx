@@ -21,6 +21,9 @@ const Navbar = () => {
             <Link to="/reminders" className="hover:text-green-200 transition-colors">Reminders</Link>
             <Link to="/dose-log" className="hover:text-green-200 transition-colors">Dose Log</Link>
             <Link to="/profile" className="hover:text-green-200 transition-colors">Profile</Link>
+            {user?.role === 'admin' && (
+            <Link to="/admin/users" className="hover:text-green-200 transition-colors">Admin</Link>
+            )}
             <button
               onClick={handleLogout}
               className="bg-white text-green-700 px-4 py-2 rounded hover:bg-green-100 font-medium transition-colors"

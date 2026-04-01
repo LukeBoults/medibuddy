@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import axiosInstance from '../axiosConfig';
 import { useAuth } from '../context/AuthContext';
-import { Search, Users } from 'lucide-react';
+import { Search } from 'lucide-react';
 
 const AdminUsers = () => {
   const { user } = useAuth();

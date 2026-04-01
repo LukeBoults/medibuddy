@@ -1,5 +1,5 @@
 const express = require('express');
-const { getDoseLogs, addDoseLog } = require('../controllers/doselogController');
+const { getDoseLogs, addDoseLog } = require('../controllers/doselogcontroller');
 const { protect } = require('../middleware/authMiddleware');
 const router = express.Router();
 

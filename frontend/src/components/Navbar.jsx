@@ -11,26 +11,29 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-blue-600 text-white p-4 flex justify-between items-center">
-      <Link to="/" className="text-2xl font-bold">Your apps name</Link>
-      <div>
+    <nav className="bg-green-700 text-white p-4 flex justify-between items-center shadow-md">
+      <Link to="/" className="text-2xl font-bold tracking-wide">Medibuddy</Link>
+      <div className="flex items-center gap-4">
         {user ? (
           <>
-            <Link to="/tasks" className="mr-4">CRUD</Link>
-            <Link to="/profile" className="mr-4">Profile</Link>
+            <Link to="/dashboard" className="hover:text-green-200 transition-colors">Dashboard</Link>
+            <Link to="/medications" className="hover:text-green-200 transition-colors">Medications</Link>
+            <Link to="/reminders" className="hover:text-green-200 transition-colors">Reminders</Link>
+            <Link to="/dose-log" className="hover:text-green-200 transition-colors">Dose Log</Link>
+            <Link to="/profile" className="hover:text-green-200 transition-colors">Profile</Link>
             <button
               onClick={handleLogout}
-              className="bg-red-500 px-4 py-2 rounded hover:bg-red-700"
+              className="bg-white text-green-700 px-4 py-2 rounded hover:bg-green-100 font-medium transition-colors"
             >
               Logout
             </button>
           </>
         ) : (
           <>
-            <Link to="/login" className="mr-4">Login</Link>
+            <Link to="/login" className="hover:text-green-200 transition-colors">Login</Link>
             <Link
               to="/register"
-              className="bg-green-500 px-4 py-2 rounded hover:bg-green-700"
+              className="bg-white text-green-700 px-4 py-2 rounded hover:bg-green-100 font-medium transition-colors"
             >
               Register
             </Link>

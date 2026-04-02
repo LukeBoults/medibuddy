@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import axiosInstance from '../axiosConfig';
 import { useAuth } from '../context/AuthContext';
-import { Search } from 'lucide-react';
+import { Search, Trash2 } from 'lucide-react';
 
 const AdminUsers = () => {
   const { user } = useAuth();
+  const location = useLocation();
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -19,11 +21,27 @@ const AdminUsers = () => {
         alert('Failed to fetch users.');
       }
     };
+
     if (user?.token) fetchUsers();
-  }, [user]);
+  }, [user, location.key]);
+
+  const handleDeleteUser = async (id, name) => {
+    if (!window.confirm(`Delete user "${name}"?`)) return;
+
+    try {
+      await axiosInstance.delete(`/admin/users/${id}`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      setUsers((prev) => prev.filter((u) => u._id !== id));
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to delete user.');
+    }
+  };
 
   const filtered = users.filter((u) =>
-    [u.name, u.email, u.role].some((value) => (value || '').toLowerCase().includes(searchTerm.toLowerCase()))
+    [u.name, u.email, u.role].some((value) =>
+      (value || '').toLowerCase().includes(searchTerm.toLowerCase())
+    )
   );
 
   return (
@@ -40,11 +58,15 @@ const AdminUsers = () => {
         </div>
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
           <p className="text-sm text-gray-500">Admins</p>
-          <p className="text-4xl font-bold text-[#2E7D32] mt-1">{users.filter((u) => u.role === 'admin').length}</p>
+          <p className="text-4xl font-bold text-[#2E7D32] mt-1">
+            {users.filter((u) => u.role === 'admin').length}
+          </p>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
           <p className="text-sm text-gray-500">Standard Users</p>
-          <p className="text-4xl font-bold text-[#2E7D32] mt-1">{users.filter((u) => u.role !== 'admin').length}</p>
+          <p className="text-4xl font-bold text-[#2E7D32] mt-1">
+            {users.filter((u) => u.role !== 'admin').length}
+          </p>
         </div>
       </div>
 
@@ -66,25 +88,37 @@ const AdminUsers = () => {
               <th className="px-4 py-3">Email</th>
               <th className="px-4 py-3">Role</th>
               <th className="px-4 py-3">Date of Birth</th>
+              <th className="px-4 py-3">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan="4" className="px-4 py-8 text-center text-gray-500">No users found.</td>
-              </tr>
-            ) : filtered.map((u) => (
-              <tr key={u._id} className="hover:bg-gray-50">
-                <td className="px-4 py-3 font-medium text-gray-900">{u.name}</td>
-                <td className="px-4 py-3 text-gray-600">{u.email}</td>
-                <td className="px-4 py-3">
-                  <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium capitalize ${u.role === 'admin' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
-                    {u.role}
-                  </span>
+                <td colSpan="5" className="px-4 py-8 text-center text-gray-500">
+                  No users found.
                 </td>
-                <td className="px-4 py-3 text-gray-600">{u.dob ? new Date(u.dob).toLocaleDateString() : '—'}</td>
               </tr>
-            ))}
+            ) : (
+              filtered.map((u) => (
+                <tr key={u._id} className="hover:bg-gray-50">
+                  <td className="px-4 py-3 font-medium text-gray-900">{u.name}</td>
+                  <td className="px-4 py-3 text-gray-600">{u.email}</td>
+                  <td className="px-4 py-3">{u.role}</td>
+                  <td className="px-4 py-3 text-gray-600">
+                    {u.dob ? new Date(u.dob).toLocaleDateString() : '—'}
+                  </td>
+                  <td className="px-4 py-3">
+                    <button
+                      onClick={() => handleDeleteUser(u._id, u.name)}
+                      className="inline-flex items-center gap-2 rounded-lg border border-red-200 px-3 py-2 text-red-600 hover:bg-red-50"
+                    >
+                      <Trash2 size={16} />
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

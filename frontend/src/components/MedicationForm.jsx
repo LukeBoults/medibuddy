@@ -39,11 +39,11 @@ const MedicationForm = ({ medications, setMedications, editingMedication, setEdi
     const headers = { Authorization: `Bearer ${user.token}` };
     try {
       if (editingMedication) {
-        const response = await axiosInstance.put(`/api/medications/${editingMedication._id}`, form, { headers });
+        const response = await axiosInstance.put(`/medications/${editingMedication._id}`, form, { headers });
         setMedications(medications.map(m => m._id === editingMedication._id ? response.data : m));
         setEditingMedication(null);
       } else {
-        const response = await axiosInstance.post('/api/medications', form, { headers });
+        const response = await axiosInstance.post('/medications', form, { headers });
         setMedications([...medications, response.data]);
       }
       setForm({ name: '', dosage: '', form: 'tablet', frequency: '', startDate: '', endDate: '', prescribingDoctor: '', notes: '' });

@@ -26,7 +26,7 @@ const AddEditMedication = () => {
     const fetchMedication = async () => {
       if (!id || !user?.token) return;
       try {
-        const response = await axiosInstance.get(`/api/medications/${id}`, {
+        const response = await axiosInstance.get(`/medications/${id}`, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
         const med = response.data;
@@ -57,9 +57,9 @@ const AddEditMedication = () => {
     try {
       const headers = { Authorization: `Bearer ${user.token}` };
       if (id) {
-        await axiosInstance.put(`/api/medications/${id}`, form, { headers });
+        await axiosInstance.put(`/medications/${id}`, form, { headers });
       } else {
-        await axiosInstance.post('/api/medications', form, { headers });
+        await axiosInstance.post('/medications', form, { headers });
       }
       navigate('/user/medications');
     } catch {

@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import axiosInstance from '../axiosConfig';
 import { useAuth } from '../context/AuthContext';
 import { Search, Trash2 } from 'lucide-react';
 
 const AdminUsers = () => {
   const { user } = useAuth();
-  const location = useLocation();
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -23,7 +21,7 @@ const AdminUsers = () => {
     };
 
     if (user?.token) fetchUsers();
-  }, [user, location.key]);
+  }, [user]);
 
   const handleDeleteUser = async (id, name) => {
     if (!window.confirm(`Delete user "${name}"?`)) return;

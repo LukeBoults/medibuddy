@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import axiosInstance from '../axiosConfig';
 import { useAuth } from '../context/AuthContext';
 import ReminderForm from '../components/ReminderForm';
+import { Bell, BellOff, Clock, Calendar, List, Plus } from 'lucide-react';
 
 const Reminders = () => {
   const { user } = useAuth();
@@ -10,6 +11,8 @@ const Reminders = () => {
   const [reminders, setReminders] = useState([]);
   const [medications, setMedications] = useState([]);
   const [editingReminder, setEditingReminder] = useState(null);
+  const [view, setView] = useState('list');
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -21,21 +24,23 @@ const Reminders = () => {
         ]);
         setReminders(remindersRes.data);
         setMedications(medsRes.data);
-      } catch (error) {
+      } catch {
         alert('Failed to fetch reminders.');
       }
     };
+
     if (user?.token) fetchData();
   }, [user, location.key]);
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this reminder?')) return;
+
     try {
       await axiosInstance.delete(`/reminders/${id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-      setReminders(reminders.filter(r => r._id !== id));
-    } catch (error) {
+      setReminders((prev) => prev.filter((r) => r._id !== id));
+    } catch {
       alert('Failed to delete reminder.');
     }
   };
@@ -47,77 +52,193 @@ const Reminders = () => {
         { isActive: !reminder.isActive },
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
-      setReminders(reminders.map(r => r._id === reminder._id ? response.data : r));
-    } catch (error) {
+      setReminders((prev) =>
+        prev.map((r) => (r._id === reminder._id ? response.data : r))
+      );
+    } catch {
       alert('Failed to update reminder.');
     }
   };
 
+  const activeCount = reminders.filter((r) => r.isActive).length;
+
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold text-green-700 mb-6">Reminders</h1>
+    <div className="p-6 max-w-7xl mx-auto">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Reminders</h1>
+          <p className="text-gray-600">Manage your medication reminder schedule</p>
+        </div>
+        <button
+          onClick={() => {
+            setEditingReminder(null);
+            setShowForm(!showForm);
+          }}
+          className="bg-[#2E7D32] hover:bg-[#1B5E20] text-white px-4 py-2 rounded-lg flex items-center gap-2 font-medium transition-colors"
+        >
+          <Plus size={20} />
+          {showForm ? 'Close Form' : 'Add Reminder'}
+        </button>
+      </div>
 
-      <ReminderForm
-        reminders={reminders}
-        setReminders={setReminders}
-        medications={medications}
-        editingReminder={editingReminder}
-        setEditingReminder={setEditingReminder}
-      />
+      {showForm && (
+        <ReminderForm
+          reminders={reminders}
+          setReminders={setReminders}
+          medications={medications}
+          editingReminder={editingReminder}
+          setEditingReminder={(r) => {
+            setEditingReminder(r);
+            if (!r) setShowForm(false);
+          }}
+        />
+      )}
 
-      <div className="bg-white border border-gray-200 rounded-lg shadow-sm mt-6">
-        {reminders.length === 0 ? (
-          <p className="text-gray-400 p-6">No reminders set up yet.</p>
-        ) : (
-          <table className="w-full text-left">
-            <thead className="bg-green-50 text-green-700 text-sm uppercase">
-              <tr>
-                <th className="px-4 py-3">Medication</th>
-                <th className="px-4 py-3">Time</th>
-                <th className="px-4 py-3">Frequency</th>
-                <th className="px-4 py-3">Active</th>
-                <th className="px-4 py-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {reminders.map(reminder => (
-                <tr key={reminder._id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-medium text-gray-800">
+      <div className="flex bg-gray-100 rounded-lg p-1 max-w-xs mb-6">
+        <button
+          onClick={() => setView('list')}
+          className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-md transition-colors ${
+            view === 'list' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          <List size={16} /> List
+        </button>
+        <button
+          onClick={() => setView('calendar')}
+          className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-md transition-colors ${
+            view === 'calendar' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          <Calendar size={16} /> Calendar
+        </button>
+      </div>
+
+      {view === 'list' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {reminders.length === 0 ? (
+            <p className="text-gray-400 col-span-3 text-center py-12">No reminders set up yet.</p>
+          ) : reminders.map((reminder) => (
+            <div
+              key={reminder._id}
+              className={`bg-white rounded-xl border-2 shadow-sm p-5 ${
+                reminder.isActive ? 'border-[#2E7D32]' : 'border-gray-200 opacity-60'
+              }`}
+            >
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-900">
                     {reminder.medicationId?.name || 'Unknown'}
-                  </td>
-                  <td className="px-4 py-3 text-gray-600">{reminder.scheduledTime}</td>
-                  <td className="px-4 py-3 text-gray-600 capitalize">{reminder.frequencyType}</td>
-                  <td className="px-4 py-3">
-                    <button
-                      onClick={() => handleToggle(reminder)}
-                      className={`text-xs px-3 py-1 rounded-full font-medium ${
-                        reminder.isActive
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-gray-100 text-gray-500'
+                  </h3>
+                  <p className="text-sm text-gray-500 capitalize">{reminder.frequencyType}</p>
+                </div>
+                {reminder.isActive ? (
+                  <Bell className="text-[#2E7D32]" size={20} />
+                ) : (
+                  <BellOff className="text-gray-400" size={20} />
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 mb-4">
+                <Clock size={16} className="text-gray-500" />
+                <span className="text-lg font-semibold text-[#2E7D32]">{reminder.scheduledTime}</span>
+              </div>
+
+              <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                <span className="text-sm text-gray-600">{reminder.isActive ? 'Active' : 'Inactive'}</span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleToggle(reminder)}
+                    className={`relative w-10 h-5 rounded-full transition-colors ${
+                      reminder.isActive ? 'bg-[#2E7D32]' : 'bg-gray-300'
+                    }`}
+                  >
+                    <span
+                      className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+                        reminder.isActive ? 'translate-x-5' : 'translate-x-0.5'
+                      }`}
+                    />
+                  </button>
+                  <button
+                    onClick={() => {
+                      setEditingReminder(reminder);
+                      setShowForm(true);
+                    }}
+                    className="text-xs text-[#2E7D32] border border-[#2E7D32] rounded px-2 py-1 hover:bg-green-50"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(reminder._id)}
+                    className="text-xs text-red-500 border border-red-300 rounded px-2 py-1 hover:bg-red-50"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {view === 'calendar' && (
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-1">Weekly Reminder Schedule</h2>
+          <p className="text-sm text-gray-500 mb-4">Your active reminders this week</p>
+          <div className="space-y-3">
+            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => {
+              const date = new Date();
+              date.setDate(date.getDate() - date.getDay() + i + 1);
+              const isToday = date.toDateString() === new Date().toDateString();
+
+              return (
+                <div
+                  key={day}
+                  className={`flex items-center justify-between p-4 rounded-lg border-2 ${
+                    isToday ? 'bg-green-50 border-[#2E7D32]' : 'bg-white border-gray-200'
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <div
+                      className={`w-14 h-14 rounded-lg flex flex-col items-center justify-center ${
+                        isToday ? 'bg-[#2E7D32] text-white' : 'bg-gray-100 text-gray-700'
                       }`}
                     >
-                      {reminder.isActive ? 'Active' : 'Inactive'}
-                    </button>
-                  </td>
-                  <td className="px-4 py-3 flex gap-2">
-                    <button
-                      onClick={() => setEditingReminder(reminder)}
-                      className="text-sm text-green-600 border border-green-600 rounded px-3 py-1 hover:bg-green-50"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(reminder._id)}
-                      className="text-sm text-red-500 border border-red-400 rounded px-3 py-1 hover:bg-red-50"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+                      <span className="text-xs font-medium">{day}</span>
+                      <span className="text-xl font-bold">{date.getDate()}</span>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900">
+                        {date.toLocaleDateString('en-US', { weekday: 'long' })}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Bell className="text-[#2E7D32]" size={18} />
+                    <span className="font-semibold text-[#2E7D32]">{activeCount} reminders</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+          <p className="text-sm text-gray-500">Total Active Reminders</p>
+          <p className="text-4xl font-bold text-[#2E7D32] mt-1">{activeCount}</p>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+          <p className="text-sm text-gray-500">Total Reminders</p>
+          <p className="text-4xl font-bold text-[#2E7D32] mt-1">{reminders.length}</p>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+          <p className="text-sm text-gray-500">Inactive</p>
+          <p className="text-4xl font-bold text-gray-400 mt-1">{reminders.length - activeCount}</p>
+        </div>
       </div>
     </div>
   );

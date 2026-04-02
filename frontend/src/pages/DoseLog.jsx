@@ -50,11 +50,12 @@ const DoseLog = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       const response = await axiosInstance.post('/dose-logs', form, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-      setLogs([response.data, ...logs]);
+      setLogs((prev) => [response.data, ...prev]);
       setForm({
         reminderId: '',
         medicationId: '',
@@ -135,9 +136,15 @@ const DoseLog = () => {
             ) : (
               logs.map((log) => (
                 <tr key={log._id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-medium text-gray-800">{log.medicationId?.name || 'Unknown'}</td>
-                  <td className="px-4 py-3 text-gray-600">{log.reminderId?.scheduledTime || '—'}</td>
-                  <td className="px-4 py-3 text-gray-600">{new Date(log.takenAt).toLocaleDateString()}</td>
+                  <td className="px-4 py-3 font-medium text-gray-800">
+                    {log.medicationId?.name || 'Unknown'}
+                  </td>
+                  <td className="px-4 py-3 text-gray-600">
+                    {log.reminderId?.scheduledTime || '—'}
+                  </td>
+                  <td className="px-4 py-3 text-gray-600">
+                    {new Date(log.takenAt).toLocaleDateString()}
+                  </td>
                   <td className="px-4 py-3">
                     <span className={`text-xs px-2 py-1 rounded-full font-medium capitalize ${statusStyles[log.status]}`}>
                       {log.status}

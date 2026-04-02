@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
 import axiosInstance from '../axiosConfig';
 import TaskForm from '../components/TaskForm';
 import TaskList from '../components/TaskList';
@@ -7,7 +6,6 @@ import { useAuth } from '../context/AuthContext';
 
 const Tasks = () => {
   const { user } = useAuth();
-  const location = useLocation();
   const [tasks, setTasks] = useState([]);
   const [editingTask, setEditingTask] = useState(null);
 
@@ -23,8 +21,8 @@ const Tasks = () => {
       }
     };
 
-    if (user?.token) fetchTasks();
-  }, [user, location.key]);
+    fetchTasks();
+  }, [user]);
 
   return (
     <div className="container mx-auto p-6">

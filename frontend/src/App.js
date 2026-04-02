@@ -10,6 +10,7 @@ import AdminUsers from './pages/AdminUsers';
 import AdminDashboard from './pages/AdminDashboard';
 import MedicationCatalogue from './pages/MedicationCatalogue';
 import NotificationTemplates from './pages/NotificationTemplates';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -18,7 +19,14 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Navigate to="/" replace />} />
 
-        <Route path="/user" element={<Layout />}>
+        <Route
+          path="/user"
+          element={
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          }
+        >
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="medications" element={<Medications />} />
           <Route path="medications/add" element={<AddEditMedication />} />
@@ -28,7 +36,14 @@ function App() {
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
 
-        <Route path="/admin" element={<Layout />}>
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute adminOnly={true}>
+              <Layout />
+            </ProtectedRoute>
+          }
+        >
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="users" element={<AdminUsers />} />
           <Route path="catalogue" element={<MedicationCatalogue />} />
@@ -36,7 +51,6 @@ function App() {
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
 
-        {/* Legacy redirects */}
         <Route path="/dashboard" element={<Navigate to="/user/dashboard" replace />} />
         <Route path="/medications" element={<Navigate to="/user/medications" replace />} />
         <Route path="/reminders" element={<Navigate to="/user/reminders" replace />} />

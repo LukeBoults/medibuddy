@@ -18,7 +18,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axiosInstance.post('/api/auth/login', loginData);
+      const response = await axiosInstance.post('auth/login', loginData);
       login(response.data);
       navigate(response.data.role === 'admin' ? '/admin/dashboard' : '/user/dashboard');
     } catch {
@@ -29,7 +29,7 @@ const Login = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      await axiosInstance.post('/api/auth/register', registerData);
+      await axiosInstance.post('auth/register', registerData);
       alert('Registration successful. Please log in.');
       setTab('login');
     } catch {

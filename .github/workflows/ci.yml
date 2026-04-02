@@ -55,5 +55,9 @@ jobs:
       - name: Install root dependencies
         run: npm ci
 
-      - run: pm2 start all
-      - run: pm2 restart all
+      - name: Start backend with PM2
+        working-directory: ./backend
+        run: |
+          pm2 delete medibuddy-backend || true
+          pm2 start server.js --name medibuddy-backend
+          pm2 save

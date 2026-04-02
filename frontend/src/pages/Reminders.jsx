@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import axiosInstance from '../axiosConfig';
 import { useAuth } from '../context/AuthContext';
 import ReminderForm from '../components/ReminderForm';
 
 const Reminders = () => {
   const { user } = useAuth();
+  const location = useLocation();
   const [reminders, setReminders] = useState([]);
   const [medications, setMedications] = useState([]);
   const [editingReminder, setEditingReminder] = useState(null);
@@ -23,8 +25,8 @@ const Reminders = () => {
         alert('Failed to fetch reminders.');
       }
     };
-    fetchData();
-  }, [user]);
+    if (user?.token) fetchData();
+  }, [user, location.key]);
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this reminder?')) return;

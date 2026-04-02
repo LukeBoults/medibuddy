@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import axiosInstance from '../axiosConfig';
 import { useAuth } from '../context/AuthContext';
 
@@ -10,6 +11,7 @@ const statusStyles = {
 
 const DoseLog = () => {
   const { user } = useAuth();
+  const location = useLocation();
   const [logs, setLogs] = useState([]);
   const [reminders, setReminders] = useState([]);
   const [form, setForm] = useState({
@@ -34,8 +36,8 @@ const DoseLog = () => {
       }
     };
 
-    fetchData();
-  }, [user]);
+    if (user?.token) fetchData();
+  }, [user, location.key]);
 
   const handleReminderChange = (e) => {
     const reminder = reminders.find((r) => r._id === e.target.value);

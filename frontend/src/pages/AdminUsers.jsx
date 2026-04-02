@@ -11,7 +11,7 @@ const AdminUsers = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axiosInstance.get('/api/admin/users', {
+        const response = await axiosInstance.get('/admin/users', {
           headers: { Authorization: `Bearer ${user.token}` },
         });
         setUsers(response.data);

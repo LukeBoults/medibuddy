@@ -24,8 +24,8 @@ const DoseLog = () => {
       try {
         const headers = { Authorization: `Bearer ${user.token}` };
         const [logsRes, remindersRes] = await Promise.all([
-          axiosInstance.get('/api/dose-logs', { headers }),
-          axiosInstance.get('/api/reminders', { headers }),
+          axiosInstance.get('/dose-logs', { headers }),
+          axiosInstance.get('/reminders', { headers }),
         ]);
         setLogs(logsRes.data);
         setReminders(remindersRes.data);
@@ -49,7 +49,7 @@ const DoseLog = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axiosInstance.post('/api/dose-logs', form, {
+      const response = await axiosInstance.post('/dose-logs', form, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       setLogs([response.data, ...logs]);

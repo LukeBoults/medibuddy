@@ -14,8 +14,8 @@ const Reminders = () => {
       try {
         const headers = { Authorization: `Bearer ${user.token}` };
         const [remindersRes, medsRes] = await Promise.all([
-          axiosInstance.get('/api/reminders', { headers }),
-          axiosInstance.get('/api/medications', { headers }),
+          axiosInstance.get('/reminders', { headers }),
+          axiosInstance.get('/medications', { headers }),
         ]);
         setReminders(remindersRes.data);
         setMedications(medsRes.data);
@@ -29,7 +29,7 @@ const Reminders = () => {
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this reminder?')) return;
     try {
-      await axiosInstance.delete(`/api/reminders/${id}`, {
+      await axiosInstance.delete(`/reminders/${id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       setReminders(reminders.filter(r => r._id !== id));
@@ -41,7 +41,7 @@ const Reminders = () => {
   const handleToggle = async (reminder) => {
     try {
       const response = await axiosInstance.put(
-        `/api/reminders/${reminder._id}`,
+        `/reminders/${reminder._id}`,
         { isActive: !reminder.isActive },
         { headers: { Authorization: `Bearer ${user.token}` } }
       );

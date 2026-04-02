@@ -33,11 +33,11 @@ const ReminderForm = ({ reminders, setReminders, medications, editingReminder, s
     const headers = { Authorization: `Bearer ${user.token}` };
     try {
       if (editingReminder) {
-        const response = await axiosInstance.put(`/api/reminders/${editingReminder._id}`, form, { headers });
+        const response = await axiosInstance.put(`/reminders/${editingReminder._id}`, form, { headers });
         setReminders(reminders.map(r => r._id === editingReminder._id ? response.data : r));
         setEditingReminder(null);
       } else {
-        const response = await axiosInstance.post('/api/reminders', form, { headers });
+        const response = await axiosInstance.post('/reminders', form, { headers });
         setReminders([...reminders, response.data]);
       }
       setForm({ medicationId: '', scheduledTime: '', frequencyType: 'daily', endDate: '', notes: '' });

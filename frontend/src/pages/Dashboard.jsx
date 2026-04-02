@@ -16,9 +16,9 @@ const Dashboard = () => {
       try {
         const headers = { Authorization: `Bearer ${user.token}` };
         const [medsRes, remindersRes, logsRes] = await Promise.all([
-          axiosInstance.get('/api/medications', { headers }),
-          axiosInstance.get('/api/reminders', { headers }),
-          axiosInstance.get('/api/dose-logs', { headers }),
+          axiosInstance.get('/medications', { headers }),
+          axiosInstance.get('/reminders', { headers }),
+          axiosInstance.get('/dose-logs', { headers }),
         ]);
         setMedications(medsRes.data);
         setReminders(remindersRes.data);

@@ -13,7 +13,7 @@ const Medications = () => {
   useEffect(() => {
     const fetchMedications = async () => {
       try {
-        const response = await axiosInstance.get('/api/medications', {
+        const response = await axiosInstance.get('/medications', {
           headers: { Authorization: `Bearer ${user.token}` },
         });
         setMedications(response.data);
@@ -27,7 +27,7 @@ const Medications = () => {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this medication?')) return;
     try {
-      await axiosInstance.delete(`/api/medications/${id}`, {
+      await axiosInstance.delete(`/medications/${id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       setMedications(medications.filter((m) => m._id !== id));
